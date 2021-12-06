@@ -123,7 +123,35 @@ def day4_test_a():
 
 
 def day4_a():
-    pass
+    fname = "days/4/input.txt"
+    number_draws, pos = read_number_draws_from_file(fname)
+    tables = []
+    end_of_file = False
+    while not end_of_file:
+        table, pos = read_table_from_file(fname, pos, whence=0)
+        tables.append(table)
+        with open(fname, "r") as f:
+            f.seek(0, 2)
+            eof_pos = f.tell()
+            if eof_pos == pos:
+                end_of_file = True
+            f.seek(pos)
+    print("day4_a")
+    print(number_draws)
+    print(f"There are {len(tables)} tables")
+
+    for num_i, number in enumerate(number_draws):
+        bingo_boards = []
+        for tab_i, table in enumerate(tables):
+            numbers = number_draws[slice(0, num_i + 1)]
+            bingos = check_for_bingos(table, numbers, (5, 5))
+            if bingos["rows"] or bingos["cols"]:
+                bingo_boards.append((bingos["score"], tab_i))
+        if bingo_boards:
+            break
+    print("Checking for winning boards")
+    for bingo_board in bingo_boards:
+        print(bingo_board)
 
 
 def day4_test_b():
@@ -135,3 +163,4 @@ def day4_b():
 
 
 day4_test_a()
+day4_a()
