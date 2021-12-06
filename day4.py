@@ -21,6 +21,32 @@ def get_table_col(table: List[int], j: int, dim=(5, 5)) -> List[int]:
     return col
 
 
+def check_for_bingos(table: List[int], numbers: List[int], dim_table=(5, 5)):
+    dim_x, dim_y = dim_table
+    bingos = {"rows": [], "cols": []}
+    for i in range(dim_x):
+        row = get_table_row(table, i, dim_table)
+        if set(numbers).issuperset(row):
+            bingos["rows"].append(i)
+
+    for j in range(dim_y):
+        col = get_table_col(table, j, dim_table)
+        if set(numbers).issuperset(col):
+            bingos["cols"].append(j)
+    unmarked_numbers = table.copy()
+    for num in numbers:
+        count = unmarked_numbers.count(num)
+        for i in range(count):
+            unmarked_numbers.remove(num)
+
+    score = 0
+    if bingos["rows"] or bingos["cols"]:
+        score = numbers[-1] * sum(unmarked_numbers)
+    bingos["score"] = score
+
+    return bingos
+
+
 def read_table_from_file(
     fname: str, offset: int, whence: int = 0, dim=(5, 5)
 ) -> Tuple[List[int], int]:
@@ -56,7 +82,7 @@ def read_number_draws_from_file(
     return (number_draws, pos)
 
 
-def day3_test_a():
+def day4_test_a():
     fname = "days/4/test_input.txt"
     number_draws, pos = read_number_draws_from_file(fname)
     tables = []
@@ -70,7 +96,7 @@ def day3_test_a():
             if eof_pos == pos:
                 end_of_file = True
             f.seek(pos)
-    print("day3_test_a")
+    print("day4_test_a")
     print(number_draws)
     print(f"There are {len(tables)} tables")
 
@@ -82,17 +108,30 @@ def day3_test_a():
     col_test.assertEqual(get_table_col(table, 0, (5, 5)), [22, 8, 21, 6, 1])
     col_test.assertEqual(get_table_col(table, 3, (5, 5)), [11, 4, 16, 18, 15])
 
+    for num_i, number in enumerate(number_draws):
+        bingo_boards = []
+        for tab_i, table in enumerate(tables):
+            numbers = number_draws[slice(0, num_i + 1)]
+            bingos = check_for_bingos(table, numbers, (5, 5))
+            if bingos["rows"] or bingos["cols"]:
+                bingo_boards.append((bingos["score"], tab_i))
+        if bingo_boards:
+            break
+    print("Checking for winning boards")
+    for bingo_board in bingo_boards:
+        print(bingo_board)
 
-def day3_a():
+
+def day4_a():
     pass
 
 
-def day3_test_b():
+def day4_test_b():
     pass
 
 
-def day3_b():
+def day4_b():
     pass
 
 
-day3_test_a()
+day4_test_a()
