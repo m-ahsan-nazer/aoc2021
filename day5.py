@@ -126,7 +126,7 @@ def get_vent_area(vent_boundaries: List[Tuple[int, int]]) -> List[List[int]]:
 def draw_on_vent_area(vent_area: List[List[int]], line: List[Tuple[int, int]]):
     for point in line:
         x_coord, y_coord = point
-        vent_area[y_coord - 1][x_coord - 1] += 1
+        vent_area[int(y_coord) - 1][int(x_coord) - 1] += 1
 
 
 def day5_test_a():
@@ -203,12 +203,76 @@ def day5_a():
 
 
 def day5_test_b():
-    pass
+    fname = "days/5/test_input.txt"
+    input_data = read_input_file(fname)
+    num_lines_with_info = []
+    for text_line in input_data:
+        tail_head = convert_text_to_tail_head(text_line)
+        num_line = convert_tail_head_to_line(tail_head)
+        line_type = None
+        if is_horizontal(tail_head):
+            line_type = "h"
+        elif is_vertical(tail_head):
+            line_type = "v"
+        info = {"th": tail_head, "nl": num_line, "lt": line_type}
+        num_lines_with_info.append(info)
+
+    pprint(num_lines_with_info[4])
+
+    vent_boundaries = get_vent_boundaries(num_lines_with_info)
+    vent_area = get_vent_area(vent_boundaries)
+    for info in num_lines_with_info:
+        # if info["lt"] == "h" or info["lt"] == "v":
+        draw_on_vent_area(vent_area, info["nl"])
+
+    pprint(vent_area)
+    vent_area_flattened = []
+    for row in vent_area:
+        for point in row:
+            vent_area_flattened.append(point)
+
+    count_0 = vent_area_flattened.count(0)
+    count_1 = vent_area_flattened.count(1)
+    count_all = len(vent_area_flattened)
+    print("count 0: ", count_0)
+    print("count 1: ", count_1)
+    print("count >=2: ", count_all - count_0 - count_1)
 
 
 def day5_b():
-    pass
+    fname = "days/5/input.txt"
+    input_data = read_input_file(fname)
+    num_lines_with_info = []
+    for text_line in input_data:
+        tail_head = convert_text_to_tail_head(text_line)
+        num_line = convert_tail_head_to_line(tail_head)
+        line_type = None
+        if is_horizontal(tail_head):
+            line_type = "h"
+        elif is_vertical(tail_head):
+            line_type = "v"
+        info = {"th": tail_head, "nl": num_line, "lt": line_type}
+        num_lines_with_info.append(info)
+
+    vent_boundaries = get_vent_boundaries(num_lines_with_info)
+    vent_area = get_vent_area(vent_boundaries)
+    for info in num_lines_with_info:
+        draw_on_vent_area(vent_area, info["nl"])
+
+    vent_area_flattened = []
+    for row in vent_area:
+        for point in row:
+            vent_area_flattened.append(point)
+
+    count_0 = vent_area_flattened.count(0)
+    count_1 = vent_area_flattened.count(1)
+    count_all = len(vent_area_flattened)
+    print("count 0: ", count_0)
+    print("count 1: ", count_1)
+    print("count >=2: ", count_all - count_0 - count_1)
 
 
 # day5_test_a()
-day5_a()
+# day5_a()
+# day5_test_b()
+day5_b()
