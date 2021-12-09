@@ -75,11 +75,11 @@ def day6_test_b():
     fname = "days/6/test_input.txt"
     istate = read_input_data(fname)
     total = 0
-    for j, fish in enumerate(istate):
+    for j, fish in enumerate(istate[0:1]):
         fish = [fish]
         print("Initial state: ", istate)
         first_gen_fish = []
-        for i in range(256):
+        for i in range(120):
             zeros_count_fish = fish.count(0)
             zeros_count_first_gen_fish = first_gen_fish.count(0)
             fish = tick_fish_clock(first_gen=False, fish=fish)
@@ -90,7 +90,10 @@ def day6_test_b():
             first_gen_fish += spawn_new_baby_fish(
                 first_gen=True, num_baby_fish=zeros_count_fish
             )
-            # print(f"After {i:3}  days:", fish + first_gen_fish)
+            print(
+                f"After {i:3},{len(fish) + len(first_gen_fish) }  days:",
+                # fish + first_gen_fish,
+            )
         print(
             f"{istate[j]} initial fish there are after {i+1} days: ",
             len(fish) + len(first_gen_fish),
@@ -102,7 +105,31 @@ def day6_test_b():
 
 def day6_b():
     fname = "days/6/input.txt"
-    pass
+    istate = read_input_data(fname)
+    total = 0
+    for j, fish in enumerate(istate[0]):
+        fish = [fish]
+        print("Initial state: ", istate)
+        first_gen_fish = []
+        for i in range(18):
+            zeros_count_fish = fish.count(0)
+            zeros_count_first_gen_fish = first_gen_fish.count(0)
+            fish = tick_fish_clock(first_gen=False, fish=fish)
+            fish += spawn_new_baby_fish(
+                first_gen=False, num_baby_fish=zeros_count_first_gen_fish
+            )
+            first_gen_fish = tick_fish_clock(first_gen=True, fish=first_gen_fish)
+            first_gen_fish += spawn_new_baby_fish(
+                first_gen=True, num_baby_fish=zeros_count_fish
+            )
+            print(f"After {i:3}  days:", fish + first_gen_fish)
+        print(
+            f"{istate[j]} initial fish there are after {i+1} days: ",
+            len(fish) + len(first_gen_fish),
+        )
+        total += len(fish) + len(first_gen_fish)
+
+    print(f"All fish after {i+1} days: ", total)
 
 
 # day6_test_a()
