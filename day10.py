@@ -187,25 +187,38 @@ def day10_test_b():
     line1 = "{()()()>"
     line2 = "(((()))}"
     line3 = "<([]){()}[{}])"
-    total_score = 0
+    scores = []
     for line in input_data:
         c = get_missing_bracket(line[0:])
         if c is not None:
             continue
         incomplete_line = get_incomplete_line(line)
-        score = get_bracket_score(c)
+        line_completing_brackets = get_line_completing_brackets(incomplete_line)
+        score = get_completion_score(line_completing_brackets)
         print(f"score {c}: ", score)
-        total_score += score
-
-    print(f"total score: {total_score}")
+        scores.append(score)
+    scores.sort()
+    print("winner: ", scores, scores[(len(scores) - 1) // 2])
 
 
 def day10_b():
-    # fname = "days/10/input.txt"
-    pass
+    fname = "days/10/input.txt"
+    input_data = read_input_data(fname)
+    scores = []
+    for line in input_data:
+        c = get_missing_bracket(line[0:])
+        if c is not None:
+            continue
+        incomplete_line = get_incomplete_line(line)
+        line_completing_brackets = get_line_completing_brackets(incomplete_line)
+        score = get_completion_score(line_completing_brackets)
+        print(f"score {c}: ", score)
+        scores.append(score)
+    scores.sort()
+    print("winner: ", scores, scores[(len(scores) - 1) // 2])
 
 
 # day10_test_a()
 # day10_a()
-day10_test_b()
-# day10_b()
+# day10_test_b()
+day10_b()
