@@ -33,9 +33,72 @@ def get_mirror(c: str) -> str:
     return c_mirror
 
 
+def get_first_c_bracket(s: str) -> Tuple[str, int]:
+    assert s != ""
+
+    brackets = get_brackets()
+    c_brackets = brackets.get("c")
+    ics = []
+    for c in c_brackets:
+        if c in s:
+            ic = s.index(c)
+            ics.append(ic)
+    print(ics, "ics, c: ", c)
+    min_ic = min(ics)
+    c = s[min_ic]
+    return (c, min_ic)
+
+
+def pop_oc_brackets_from_str(s: str, c: str, ic: int) -> str:
+    ss = s[: ic - 1] + s[ic + 1 :]
+    return ss
+
+
+def get_missing_bracket(s: str) -> str:
+    while len(s) >= 1:
+        c, ic = get_first_c_bracket(s)
+        print("c, ic: ", c, ic, s)
+        has_matching_bracket = check_has_matching_bracket(s, c, ic)
+        if has_matching_bracket:
+            s = pop_oc_brackets_from_str(s, c, ic)
+        else:
+            break
+    return c
+
+
+def get_bracket_score(c: str) -> int:
+    brackets = get_brackets()
+    assert c in brackets["c"]
+
+    if c == ")":
+        return 3
+    elif c == "]":
+        return 57
+    elif c == "}":
+        return 1197
+    elif c == ">":
+        return 25137
+
+
+def check_has_matching_bracket(s: str, c: str, ic: int) -> bool:
+    assert s[ic] == c
+
+    c_mirror = get_mirror(c)
+    return s[ic - 1] == c_mirror
+
+
 def day10_test_a():
     fname = "days/10/test_input.txt"
     input_data = read_input_data(fname)
+    line = input_data[0]
+    print("line: ", line)
+    # c, ic = get_first_c_bracket(line)
+    # print(c, ic)
+    # has_matching_bracket = check_has_matching_bracket(line, c, ic)
+    # print(f"has_matching_bracket: {has_matching_bracket}")
+    c = get_missing_bracket(line)
+    # score = get_bracket_score(c)
+    # print(f"score {c}: ", score)
 
 
 def day10_a():
