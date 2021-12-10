@@ -43,10 +43,11 @@ def get_first_c_bracket(s: str) -> Tuple[str, int]:
         if c in s:
             ic = s.index(c)
             ics.append(ic)
-    print(ics, "ics, c: ", c)
-    min_ic = min(ics)
-    c = s[min_ic]
-    return (c, min_ic)
+    if len(ics) >= 1:
+        min_ic = min(ics)
+        c = s[min_ic]
+        return (c, min_ic)
+    return (None, None)
 
 
 def pop_oc_brackets_from_str(s: str, c: str, ic: int) -> str:
@@ -57,13 +58,52 @@ def pop_oc_brackets_from_str(s: str, c: str, ic: int) -> str:
 def get_missing_bracket(s: str) -> str:
     while len(s) >= 1:
         c, ic = get_first_c_bracket(s)
-        print("c, ic: ", c, ic, s)
+        if c is None:
+            break
         has_matching_bracket = check_has_matching_bracket(s, c, ic)
         if has_matching_bracket:
             s = pop_oc_brackets_from_str(s, c, ic)
         else:
             break
+    # if c is None:
+    # return get_mirror(s[-1])
     return c
+
+
+def get_incomplete_line(s: str) -> str:
+    while len(s) >= 1:
+        c, ic = get_first_c_bracket(s)
+        if c is None:
+            break
+        has_matching_bracket = check_has_matching_bracket(s, c, ic)
+        if has_matching_bracket:
+            s = pop_oc_brackets_from_str(s, c, ic)
+        else:
+            break
+
+    return s
+
+
+def get_line_completing_brackets(s: str) -> str:
+    line_completing_brackets = ""
+    for o in s[::-1]:
+        c = get_mirror(o)
+        line_completing_brackets += c
+    return line_completing_brackets
+
+
+def get_completion_score(s: str) -> int:
+    score = 0
+    for c in s:
+        if c == ")":
+            score = score * 5 + 1
+        elif c == "]":
+            score = score * 5 + 2
+        elif c == "}":
+            score = score * 5 + 3
+        elif c == ">":
+            score = score * 5 + 4
+    return score
 
 
 def get_bracket_score(c: str) -> int:
@@ -90,25 +130,74 @@ def check_has_matching_bracket(s: str, c: str, ic: int) -> bool:
 def day10_test_a():
     fname = "days/10/test_input.txt"
     input_data = read_input_data(fname)
-    line = input_data[0]
-    print("line: ", line)
+    # line = input_data[0]
+    line0 = "(]"
+    line1 = "{()()()>"
+    line2 = "(((()))}"
+    line3 = "<([]){()}[{}])"
+    # line = line3
+    # print("line: ", line)
     # c, ic = get_first_c_bracket(line)
     # print(c, ic)
     # has_matching_bracket = check_has_matching_bracket(line, c, ic)
     # print(f"has_matching_bracket: {has_matching_bracket}")
-    c = get_missing_bracket(line)
-    # score = get_bracket_score(c)
-    # print(f"score {c}: ", score)
+    total_score = 0
+    for line in input_data:
+        c = get_missing_bracket(line)
+        if c is None:
+            continue
+        score = get_bracket_score(c)
+        print(f"score {c}: ", score)
+        total_score += score
+
+    print(f"total score: {total_score}")
 
 
 def day10_a():
-    # fname = "days/10/input.txt"
-    pass
+    fname = "days/10/input.txt"
+    input_data = read_input_data(fname)
+    # line = input_data[0]
+    line0 = "(]"
+    line1 = "{()()()>"
+    line2 = "(((()))}"
+    line3 = "<([]){()}[{}])"
+    # line = line3
+    # print("line: ", line)
+    # c, ic = get_first_c_bracket(line)
+    # print(c, ic)
+    # has_matching_bracket = check_has_matching_bracket(line, c, ic)
+    # print(f"has_matching_bracket: {has_matching_bracket}")
+    total_score = 0
+    for line in input_data:
+        c = get_missing_bracket(line)
+        if c is None:
+            continue
+        score = get_bracket_score(c)
+        print(f"score {c}: ", score)
+        total_score += score
+
+    print(f"total score: {total_score}")
 
 
 def day10_test_b():
-    # fname = "days/10/test_input.txt"
-    pass
+    fname = "days/10/test_input.txt"
+    input_data = read_input_data(fname)
+    # line = input_data[0]
+    line0 = "(]"
+    line1 = "{()()()>"
+    line2 = "(((()))}"
+    line3 = "<([]){()}[{}])"
+    total_score = 0
+    for line in input_data:
+        c = get_missing_bracket(line[0:])
+        if c is not None:
+            continue
+        incomplete_line = get_incomplete_line(line)
+        score = get_bracket_score(c)
+        print(f"score {c}: ", score)
+        total_score += score
+
+    print(f"total score: {total_score}")
 
 
 def day10_b():
@@ -116,7 +205,7 @@ def day10_b():
     pass
 
 
-day10_test_a()
+# day10_test_a()
 # day10_a()
-# day10_test_b()
+day10_test_b()
 # day10_b()
