@@ -67,7 +67,7 @@ def day11_test_a():
     print_data(data_input)
     print("len data: ", len(data_input))
 
-    nsteps = 10
+    nsteps = 100
     count = 0
     for i in range(nsteps):
         step(data_input)
@@ -79,23 +79,61 @@ def day11_test_a():
 def day11_a():
     fname = "days/11/input.txt"
     data_input = read_data_input(fname)
-    pass
+    print("initial data")
+    print_data(data_input)
+    print("len data: ", len(data_input))
+
+    nsteps = 100
+    count = 0
+    for i in range(nsteps):
+        step(data_input)
+        count += count_flashes(data_input)
+        print(f"After step {i+1} there are {count} flashes")
+        print_data(data_input)
 
 
 def day11_test_b():
     fname = "days/11/test_input.txt"
     data_input = read_data_input(fname)
-    pass
+    print("initial data")
+    print_data(data_input)
+    print("len data: ", len(data_input))
+
+    count = 0
+    i = 0
+    while True:
+        step(data_input)
+        i += 1
+        current_count = count_flashes(data_input)
+        if current_count == 100:
+            break
+        count += current_count
+    print(f"After step {i} there are {count} flashes")
+    print_data(data_input)
 
 
 def day11_b():
     fname = "days/11/input.txt"
     data_input = read_data_input(fname)
-    pass
+    print("initial data")
+    print_data(data_input)
+    print("len data: ", len(data_input))
+
+    count = 0
+    i = 0
+    while True:
+        step(data_input)
+        i += 1
+        current_count = count_flashes(data_input)
+        if current_count == 100:
+            break
+        count += current_count
+    print(f"After step {i} there are {count} flashes")
+    print_data(data_input)
 
 
 if __name__ == "__main__":
-    day11_test_a()
+    # day11_test_a()
     # day11_a()
     # day11_test_b()
-    # day11_b()
+    day11_b()
