@@ -57,7 +57,7 @@ def day6_a():
     fish = read_input_data(fname)
     first_gen_fish = []
     print("Initial state: ", fish)
-    for i in range(80):
+    for i in range(256):
         zeros_count_fish = fish.count(0)
         zeros_count_first_gen_fish = first_gen_fish.count(0)
         fish = tick_fish_clock(first_gen=False, fish=fish)
