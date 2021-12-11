@@ -155,7 +155,7 @@ def get_digit_set_from_decoded_patterns(decoded_patterns: Dict) -> Dict:
 
 
 def day8_b():
-    fname = "days/8/test_input.txt"
+    fname = "days/8/input.txt"
     signal_patterns_data, four_digit_output_data = read_input_data_b(fname)
     # input_data = [s + f for (s, f) in zip(signal_patterns_data, four_digit_output_data)]
     outputs = []
@@ -167,10 +167,10 @@ def day8_b():
         digits = ""
         for c in four_digit_output_data[i]:
             for key, value in digit_set_from_decoded_patterns.items():
-                diff = value.difference(set(c))
-                if len(diff) == 0:
-                    print("diff: ", diff, len(diff))
+                intersection = value.union(set(c))
+                if intersection == value and intersection == set(c):
                     digits += key
+                    print(set(c), value)
                     print("key: ", key)
         print("digig: ", digits)
         outputs.append(digits)
