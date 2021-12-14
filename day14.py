@@ -1,5 +1,6 @@
 from typing import Dict, List, Tuple
 from pprint import pprint
+import copy
 
 
 def read_input_data(fname: str) -> Dict:
@@ -12,6 +13,14 @@ def read_input_data(fname: str) -> Dict:
             char = char.strip()
             input_data[pair] = char
     return input_data
+
+
+def get_polymer_template_as_dict(polymer_template: str) -> Dict:
+    polymer = {}
+    for i in range(len(polymer_template) - 1):
+        key = polymer_template[i : i + 2]
+        polymer[key] = 1
+    return polymer
 
 
 def count_occurrences(pt: str) -> Dict:
@@ -39,19 +48,47 @@ def insert_char_get_new_polymer(pt: str, input_data: Dict) -> str:
             new_pt = new_pt + pt[i]
 
     new_pt = new_pt + pt[-1]
-    # new_pt_set = set(new_pt)
-    # new_pt_counts = {}
-
-    # for c in new_pt_set:
-    #     new_pt_counts[c] = new_pt.count(c)
-
-    # new_pt_counts_items = sorted(
-    #     new_pt_counts.items(), key=lambda item: item[1], reverse=False
-    # )
-    # min_item = new_pt_counts_items[0]
-    # max_item = new_pt_counts_items[-1]
 
     return new_pt
+
+
+def get_new_polymer(polymer: Dict, polymer_map: Dict) -> Dict:
+    # new_polymer = copy.deepcopy(polymer)
+    new_polymer = {}
+    for key in polymer:
+        insertion_key = polymer_map.get(key, None)
+        if insertion_key:
+            # new_polymer[key] = 0
+            left_insertion = key[0] + insertion_key
+            if polymer.get(left_insertion):
+                new_polymer[left_insertion] = polymer[left_insertion] + polymer[key]
+            else:
+                if new_polymer.get(left_insertion):
+                    new_polymer[left_insertion] += 1
+                else:
+                    new_polymer[left_insertion] = 1
+            right_insertion = insertion_key + key[1]
+            if polymer.get(right_insertion):
+                new_polymer[right_insertion] = polymer[right_insertion] + polymer[key]
+            else:
+                if new_polymer.get(right_insertion):
+                    new_polymer[right_insertion] += 1
+                else:
+                    new_polymer[right_insertion] = 1
+
+    # only keep non zero polymer chains
+    for key, value in list(new_polymer.items()):
+        if value == 0:
+            new_polymer.pop(key)
+    return new_polymer
+
+
+def print_polymer(polymer: Dict):
+    non_zero_polymer = {}
+    for key in polymer:
+        if polymer[key] > 0:
+            non_zero_polymer[key] = polymer[key]
+    pprint(non_zero_polymer)
 
 
 # def insert_char_and_count(pt)
@@ -90,6 +127,17 @@ def day14_a():
 def day14_test_b():
     fname = "days/14/test_input.txt"
     polymer_template = "NNCB"
+    polymer = get_polymer_template_as_dict(polymer_template)
+    pprint(polymer)
+    polymer_map = read_input_data(fname)
+    for i in range(4):
+        polymer = get_new_polymer(polymer=polymer, polymer_map=polymer_map)
+        # print_polymer(polymer)
+        pprint(polymer)
+    # pprint(polymer)
+    # pprint(len(polymer))
+    # print(sum(polymer.values()))
+    # counts = dict.fromkeys(polymer_map.values(), 0)
 
 
 def day14_b():
@@ -98,7 +146,7 @@ def day14_b():
 
 
 if __name__ == "__main__":
-    day14_test_a()
+    # day14_test_a()
     # day14_a()
-    # day14_test_b()
+    day14_test_b()
     # day14_b()
