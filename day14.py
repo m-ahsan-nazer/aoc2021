@@ -14,9 +14,22 @@ def read_input_data(fname: str) -> Dict:
     return input_data
 
 
-def insert_char_get_new_polymer_and_count(
-    pt: str, input_data: Dict
-) -> Tuple[str, Tuple[str, int]]:
+def count_occurrences(pt: str) -> Dict:
+    pt_set = set(pt)
+    pt_counts = {}
+    for c in pt_set:
+        pt_counts[c] = pt.count(c)
+
+    new_pt_counts_items = sorted(
+        pt_counts.items(), key=lambda item: item[1], reverse=False
+    )
+    min_item = new_pt_counts_items[0]
+    max_item = new_pt_counts_items[-1]
+
+    return {"min": min_item, "max": max_item}
+
+
+def insert_char_get_new_polymer(pt: str, input_data: Dict) -> str:
     new_pt = ""
     for i in range(len(pt) - 1):
         insertion_key = input_data.get(pt[i : (i + 2)])
@@ -26,19 +39,22 @@ def insert_char_get_new_polymer_and_count(
             new_pt = new_pt + pt[i]
 
     new_pt = new_pt + pt[-1]
-    new_pt_set = set(new_pt)
-    new_pt_counts = {}
+    # new_pt_set = set(new_pt)
+    # new_pt_counts = {}
 
-    for c in new_pt_set:
-        new_pt_counts[c] = new_pt.count(c)
+    # for c in new_pt_set:
+    #     new_pt_counts[c] = new_pt.count(c)
 
-    new_pt_counts_items = sorted(
-        new_pt_counts.items(), key=lambda item: item[1], reverse=False
-    )
-    min_item = new_pt_counts_items[0]
-    max_item = new_pt_counts_items[-1]
+    # new_pt_counts_items = sorted(
+    #     new_pt_counts.items(), key=lambda item: item[1], reverse=False
+    # )
+    # min_item = new_pt_counts_items[0]
+    # max_item = new_pt_counts_items[-1]
 
-    return (new_pt, {"min": min_item, "max": max_item})
+    return new_pt
+
+
+# def insert_char_and_count(pt)
 
 
 def day14_test_a():
@@ -47,13 +63,14 @@ def day14_test_a():
     input_data = read_input_data(fname)
     pprint(polymer_template)
     pprint(input_data)
-    for i in range(40):
-        polymer_template, counts = insert_char_get_new_polymer_and_count(
-            polymer_template, input_data
-        )
+    for i in range(10):
+        polymer_template = insert_char_get_new_polymer(polymer_template, input_data)
         # pprint(polymer_template)
         # pprint(counts)
+    counts = count_occurrences(polymer_template)
     pprint(counts)
+    pprint(counts["max"][1] - counts["min"][1])
+    print("done")
 
 
 def day14_a():
@@ -62,11 +79,10 @@ def day14_a():
     input_data = read_input_data(fname)
     pprint(polymer_template)
     pprint(input_data)
-    for i in range(40):
-        polymer_template, counts = insert_char_get_new_polymer_and_count(
-            polymer_template, input_data
-        )
+    for i in range(10):
+        polymer_template = insert_char_get_new_polymer(polymer_template, input_data)
     # pprint(polymer_template)
+    counts = count_occurrences(polymer_template)
     pprint(counts)
     pprint(counts["max"][1] - counts["min"][1])
 
