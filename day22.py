@@ -17,8 +17,7 @@ def read_data_input(
     reboot_steps = []
     cube_dim = (101, 101, 101)
     with open(fname, "r") as f:
-        for i in range(20):
-            line = f.readline()
+        for line in f:
             line = line.strip().strip("\n")
             on_off, ranges = line.split(" ")
             on_off = on_off.strip()
@@ -64,7 +63,12 @@ def turn_on_off(cuboid: Dict, dim: CubeDim, rs: Dict):
         get_coord_range(x_coord), get_coord_range(y_coord), get_coord_range(z_coord)
     )
     for point in cube_coords:
-        cuboid[point] = rs.get("of")
+        # cuboid[point] = rs.get("of")
+        if rs.get("of"):
+            cuboid[point] = rs.get("of")
+        else:
+            if cuboid.get(point) is not None:
+                cuboid.pop(point)
 
 
 def day22_test_a():
@@ -98,6 +102,16 @@ def day22_a():
 def day22_test_b():
     """ """
     fname = "days/22/test_input.txt"
+    reboot_steps, cube_dim = read_data_input(fname)
+    pprint(reboot_steps)
+    # all cubes are off at the start
+    cuboid = {}
+    for rs in reboot_steps:
+        # print("rs: ", rs)
+        turn_on_off(cuboid, cube_dim, rs)
+    # pprint(cuboid)
+    print("on: ", list(cuboid.values()).count(1))
+    print("size cuboid", len(cuboid))
 
 
 def day22_b():
@@ -106,6 +120,6 @@ def day22_b():
 
 if __name__ == "__main__":
     # day22_test_a()
-    day22_a()
-    # day22_test_b()
+    # day22_a()
+    day22_test_b()
     # day22_b()
