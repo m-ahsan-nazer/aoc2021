@@ -84,6 +84,7 @@ def call_func(func: List, w: int = 0, x=0, y=0, z=0) -> int:
         s = f"{_} {values[a]} {values.get(b, b)}"
         ans = perform_operation(s)
         if ans is None:
+            print("zing")
             return None
         values[a] = ans
         # pprint(s)
@@ -113,19 +114,23 @@ def day24_a():
     fname = "days/24/input.txt"
     funcs = read_data_input(fname)
     model_num = ""
+    # pprint(
+    #     # list(zip(funcs[0], funcs[1], funcs[2], funcs[3], funcs[4], funcs[5], funcs[-1]))
+    #     list(zip(funcs[0], funcs[1]))
+    # )
     # for func in funcs[-1:-2]:
-    w = 0
+    w = 1
     x = 0
     y = 0
     z = 0
     # for func in funcs[0:1]:
     for func in funcs:
         # print(func)
-        max_valid_inp = call_func(func, w, x, y, z)
+        max_valid_inp = call_func(func[::-1], w, x, y, z)
         w = max_valid_inp.get("w")
-        x = max_valid_inp.get("x")
-        y = max_valid_inp.get("y")
-        z = max_valid_inp.get("z")
+        # x = max_valid_inp.get("x")
+        # y = max_valid_inp.get("y")
+        # z = max_valid_inp.get("z")
         model_num += str(w)
         pprint(max_valid_inp)
 

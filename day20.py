@@ -40,7 +40,7 @@ def map_coords_value_to_pixel(
         for i in [x - 1, x, x + 1]:
             pixel_value = input_image.get((i, j), ".")
             input_pixels += pixel_value
-
+    assert len(input_pixels) == 9
     input_pixels = input_pixels.replace("#", "1")
     input_pixels = input_pixels.replace(".", "0")
     input_pixels_decimal_value = int(input_pixels, 2)
@@ -55,15 +55,20 @@ def get_output_image(
     # for (x, y) in input_image:
     #     pixel_value = map_coords_value_to_pixel((x, y), iea, input_image, dim)
     #     output_image[x, y] = pixel_value
-    new_dim = dim + 4
-    for y in range(-2, dim + 2):
-        for x in range(-2, dim + 2):
-            input_image_with_boundary[x + 2, y + 2] = input_image.get((x, y), ".")
+    new_dim = dim + 2
+    for y in range(-1, dim + 1):
+        for x in range(-1, dim + 1):
+            input_image_with_boundary[x + 1, y + 1] = input_image.get((x, y), ".")
     # pprint(input_image_with_boundary.keys())
     # print_image(input_image_with_boundary, new_dim)
-    for (x, y) in input_image_with_boundary:
+    for coord in input_image_with_boundary:
+        x, y = coord
         pixel_value = map_coords_value_to_pixel(
-            (x, y), iea, input_image_with_boundary, new_dim
+            # (x, y), iea, input_image_with_boundary, new_dim
+            (x, y),
+            iea,
+            input_image_with_boundary,
+            new_dim,
         )
         output_image[x, y] = pixel_value
     return (output_image, new_dim)
@@ -96,9 +101,6 @@ def day20_test_a():
 def day20_a():
     fname = "days/20/input.txt"
     iea, input_image, dim = read_data_input(fname)
-    print(iea)
-    print("dim: ", dim)
-    print("# count: ", list(input_image.values()).count("#"))
     print_image(input_image, dim)
     image, new_dim = get_output_image(iea, input_image, dim)
     print_image(image, new_dim)

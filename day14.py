@@ -57,24 +57,17 @@ def get_new_polymer(polymer: Dict, polymer_map: Dict) -> Dict:
     new_polymer = {}
     for key in polymer:
         insertion_key = polymer_map.get(key, None)
-        if insertion_key:
-            # new_polymer[key] = 0
-            left_insertion = key[0] + insertion_key
-            if polymer.get(left_insertion):
-                new_polymer[left_insertion] = polymer[left_insertion] + polymer[key]
-            else:
-                if new_polymer.get(left_insertion):
-                    new_polymer[left_insertion] += 1
-                else:
-                    new_polymer[left_insertion] = 1
-            right_insertion = insertion_key + key[1]
-            if polymer.get(right_insertion):
-                new_polymer[right_insertion] = polymer[right_insertion] + polymer[key]
-            else:
-                if new_polymer.get(right_insertion):
-                    new_polymer[right_insertion] += 1
-                else:
-                    new_polymer[right_insertion] = 1
+        left_insertion = key[0] + insertion_key
+        if left_insertion in new_polymer:
+            new_polymer[left_insertion] += polymer[key]
+        else:
+            new_polymer[left_insertion] = polymer[key]
+
+        right_insertion = insertion_key + key[1]
+        if right_insertion in new_polymer:
+            new_polymer[right_insertion] += polymer[key]
+        else:
+            new_polymer[right_insertion] = polymer[key]
 
     # only keep non zero polymer chains
     for key, value in list(new_polymer.items()):
@@ -130,14 +123,29 @@ def day14_test_b():
     polymer = get_polymer_template_as_dict(polymer_template)
     pprint(polymer)
     polymer_map = read_input_data(fname)
-    for i in range(4):
+    for i in range(1):
         polymer = get_new_polymer(polymer=polymer, polymer_map=polymer_map)
-        # print_polymer(polymer)
-        pprint(polymer)
-    # pprint(polymer)
+        # pprint(polymer)
+    pprint(polymer)
     # pprint(len(polymer))
-    # print(sum(polymer.values()))
+    print("sum: ", sum(polymer.values()))
     # counts = dict.fromkeys(polymer_map.values(), 0)
+    counts = {}
+    # for key in polymer:
+    #     first_char = key[1]
+    #     counts[first_char] = 0
+
+    print("counts: ", counts)
+    for key in polymer:
+        # if key[1] in counts:
+        #     counts[key[1]] += polymer[key]
+        # else:
+        #     counts[key[1]] = polymer[key]
+        if polymer_map[key] in counts:
+            counts[polymer_map[key]] += polymer[key]
+        else:
+            counts[polymer_map[key]] = polymer[key]
+    pprint(counts)
 
 
 def day14_b():
