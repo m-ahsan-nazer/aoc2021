@@ -1,0 +1,4 @@
+- Create virtual environment without pip.
+    -   `python3.10 -m venv  --withoutpip venv`.
+-   Install latest pip version with: 
+    -   `curl https://bootstrap.pypa.io/get-pip.py | python`
