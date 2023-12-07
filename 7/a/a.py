@@ -49,7 +49,7 @@ def get_hand_type(hand: str) -> int:
     three_in_counts = 3 in char_counts
     two_in_counts = 2 in char_counts
     if five_in_counts:  # Five of a kind
-        return 5
+        return 7 
     elif four_in_counts:  # Four of a kind
         return 6
     elif three_in_counts and two_in_counts:  # Full house
