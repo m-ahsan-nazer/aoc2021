@@ -23,6 +23,7 @@ def read_input_data(fname: str) -> Dict:
     with open(fname, "r") as f:
         left_right = list(f.readline().strip().replace("L", "0").replace("R", "1"))
         left_right = [int(lr) for lr in left_right]
+        print("len lr=", len(left_right))
         input_data["lr"] = cycle(left_right)
         f.readline()
         for line in f:
@@ -49,23 +50,28 @@ def perform_task(input_data: OrderedDict):
         num of steps to reach Z on all nodes simultaneously
     """
     lr = input_data.pop("lr")
-    task = 0
+    counts = []
     # node = next(iter(input_data))
     nodes = []
     for node in input_data:
         if node[-1] == "A":
             nodes.append(node)
-    while True:
-        goto = next(lr)
-        # node = input_data.get(node)[goto]
-        nodes = [input_data.get(node)[goto] for node in nodes]
-        # output_file.write(",".join(nodes) + "\n")
-        # if task > 50000:
-        #     break
-        task += 1
-        if all_nodes_end_in_z(nodes):
-            break
-    return task
+    for node in nodes:
+        task = 0
+        while True:
+            goto = next(lr)
+            node = input_data.get(node)[goto]
+            # nodes = [input_data.get(node)[goto] for node in nodes]
+            # output_file.write(",".join(nodes) + "\n")
+            # if task > 50000:
+            #     break
+            task += 1
+            # if all_nodes_end_in_z(nodes):
+            #     break
+            if node[-1] == "Z":
+                counts.append(task)
+                break
+    return task, counts
 
 
 class TestTask(unittest.TestCase):
@@ -99,3 +105,9 @@ if __name__ == "__main__":
     input_data = read_input_data("input.txt")
     task = perform_task(input_data)
     pprint(task)
+    # ran each A ending node individually to get
+    # counts = [18961, 12169, 17263, 13301, 14999, 16697]
+    # there are 283 left right instructions. each of the above is divisible
+    # by 283
+    # multiplying counts together I get 278789809 but its too low
+    # The solution was lcm of the counts
