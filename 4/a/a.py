@@ -79,9 +79,25 @@ def perform_task(input_data: input_data_type):
     task, int
         How many times does XMAS appear?
     """
+    input_data_array = np.array(input_data)
+    XMAS = "XMAS"
     task = 0
-    for a, b in input_data:
-        task += a * b
+    xmas_square = get_xmas_square(origin=(6, 3), input_data_array=input_data_array)
+    (top, bot, left, right, d1, d2) = get_square_edges_diagonals(
+        xmas_square=xmas_square
+    )
+    (num_row, num_col) = input_data_array.shape
+    for x in range(num_col - len(XMAS)):
+        for y in range(num_row - len(XMAS)):
+            xmas_square = get_xmas_square(
+                origin=(x, y), input_data_array=input_data_array
+            )
+            (top, bot, left, right, d1, d2) = get_square_edges_diagonals(
+                xmas_square=xmas_square
+            )
+            for edge_or_diag in (top, bot, left, right, d1, d2):
+                if "".join(top) in [XMAS, XMAS[::-1]]:
+                    task += 1
     return task
 
 
@@ -135,14 +151,14 @@ class TestTask(unittest.TestCase):
         self.assertListEqual(d1.tolist(), list("MAMS"))
         self.assertListEqual(d2.tolist(), list("SAMX"))
 
-    @unittest.skip("Skip when testing read_input_data")
+    # @unittest.skip("Skip when testing read_input_data")
     def test_perform_task(self):
         """
         Testing the task algorithm.
         """
         input_data = read_input_data("test_input_1.txt")
         task = perform_task(input_data)
-        self.assertEqual(task, 161)
+        self.assertEqual(task, 18)
 
 
 if __name__ == "__main__":
