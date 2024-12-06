@@ -2,16 +2,26 @@
 import logging
 import re
 import unittest
-from itertools import permutations
+from itertools import pairwise
 from pathlib import Path
 import numpy as np
 import pysnooper
 from pprint import pprint
-from typing import List, Tuple
+from typing import List, Tuple,Dict
 
+input_data_type = Tuple[Dict,Tuple[int,int],Tuple[int,int]]
+UP = (-1, 0)
+DOWN = (1, 0)
+LEFT = (0, -1)
+RIGHT = (0, 1)
+OBSTRUCTION = "#"
+EMPTY = "."
 
-input_data_type = Tuple[dict, List[List[int]]]
-
+class Directions:
+    UP = UP
+    DOWN = DOWN
+    LEFT = LEFT
+    RIGHT = RIGHT
 
 # @pysnooper.snoop()
 def read_input_data(fname: str) -> input_data_type:
@@ -20,79 +30,85 @@ def read_input_data(fname: str) -> input_data_type:
     -------
     input_data:
     """
-    rules = dict()
-    page_ordering = []
+    puzzle_map = dict()
     with open(Path(__file__).parent / fname, "r", encoding="utf-8") as f:
+        row =0
         for line in f:
             line = line.strip()
-            if "|" in line:
-                p1, p2 = line.split("|")
-                p1 = int(p1)
-                p2 = int(p2)
-                if p1 in rules:
-                    rules[p1].append(p2)
-                else:
-                    rules[p1] = [p2]
-            elif line:
-                line = line.split(",")
-                line = [int(p) for p in line]
-                page_ordering.append(line)
-
-    return (rules, page_ordering)
+            for col in range(len(line)):
+                ch = line[col]
+                puzzle_map[(row,col)] = ch
+                if ch == "^":
+                    origin = (row,col)
+            row+=1
+                
+    dim = (row,col+1)
+    return (puzzle_map, origin, dim) 
 
 
-# @pysnooper.snoop()
-def is_page_ordering_correct(rules: dict, page_ordering: list | tuple) -> bool:
-    for p1 in rules:
-        if p1 in page_ordering:
-            for p2 in rules[p1]:
-                if p2 in page_ordering and page_ordering.index(
-                    p1
-                ) > page_ordering.index(p2):
-                    return False
-    return True
+
+def rotate_right(direction: Tuple[int,int])->Tuple[int,int]:
+    match direction:
+        case Directions.LEFT:
+            return UP
+        case Directions.RIGHT:
+            return DOWN
+        case Directions.UP:
+            return RIGHT
+        case Directions.DOWN:
+            return LEFT
+        case _:
+            raise ValueError("Homie messed up")
 
 
-# @pysnooper.snoop()
-def correctly_insert_page(
-    page: int, rules: dict, page_ordering: list | tuple
-) -> List[int]:
-    for i in range(len(page_ordering) + 1):
-        correct_page_ordering = page_ordering.copy()
-        correct_page_ordering.insert(i, page)
-        if is_page_ordering_correct(rules, correct_page_ordering):
-            return correct_page_ordering
+def move(puzzle_map: np.ndarray, loc: Tuple[int,int], direction: Tuple[int,int]) -> Tuple[Tuple[int,int], Tuple[int,int]] | None:
+    """
+    Returns
+    -------
+    coordinates of next step and the direction
+    """
+    new_coord =  (loc[0] +  direction[0], loc[1] +  direction[1])
+    if new_coord not in puzzle_map:
+        return None
+    if puzzle_map[new_coord] == OBSTRUCTION:
+        direction = rotate_right(direction)
+        new_coord =  (loc[0] +  direction[0], loc[1] +  direction[1])
+        if new_coord not in puzzle_map:
+            return None
+        return (new_coord, direction)
+    elif puzzle_map[new_coord] in [EMPTY, "^"]:
+        return new_coord, direction
 
-
-# @pysnooper.snoop()
+# @pysnooper.snoop(output='debug.log', overwrite=True)
 def perform_task(input_data: input_data_type):
     """
     Returns:
     --------
     task, int
-        What do you get if you add up the middle page numbers after correctly ordering just those updates?
+        How many different positions could you choose for this obstruction?
     """
-    rules, page_ordering = input_data
-    incorrectly_ordered_updates = []
-    correctly_ordered_updates = []
-    for po in page_ordering:
-        if not is_page_ordering_correct(rules, po):
-            incorrectly_ordered_updates.append(po)
-
-    for po in incorrectly_ordered_updates:
-        correct_ordering = []
-        for p2 in po:
-            if len(correct_ordering) == 0:
-                correct_ordering.append(p2)
-            else:
-                correct_ordering = correctly_insert_page(p2, rules, correct_ordering)
-        correctly_ordered_updates.append(correct_ordering)
-
     task = 0
-    for po in correctly_ordered_updates:
-        middle_ind = len(po) // 2
-        task += po[middle_ind]
+    (puzzle_map, origin, dim)  = input_data
+    (num_rows, num_cols) = dim
+    for row in range(num_rows):
+        for col in range(num_cols):
+            loc = origin
+            direction = UP
+            puzzle_map_copy = puzzle_map.copy()
+            puzzle_map_copy[(row,col)] = OBSTRUCTION
+            visited_positions = set()
+            visited_positions.add((loc,direction))
+            while True:
+                new_coord_and_direction = move(puzzle_map=puzzle_map_copy, loc=loc, direction=direction)
+                if not new_coord_and_direction:
+                    break
+                (loc , direction) = new_coord_and_direction
 
+                if (loc , direction) in visited_positions:
+                    task+=1
+                    break
+                else:
+                    visited_positions.add((loc , direction))
     return task
 
 
@@ -104,38 +120,12 @@ class TestTask(unittest.TestCase):
 
     def test_sample_input(self):
         """
-                Testing the input file.
-        47|53
-        97|13
-        97|61
-        97|47
-        75|29
-        61|13
-        75|53
-        29|13
-        97|29
-        53|29
-        61|53
-        97|53
-        61|29
-        47|13
-        75|47
-        97|75
-        47|61
-        75|61
-        47|29
-        75|13
-        53|13
+        Testing the input file.
         """
         input_data = read_input_data("test_input_1.txt")
-
-        rules, page_ordering = input_data
-        self.assertSetEqual(set(rules[97]), set([13, 61, 47, 29, 53, 75]))
-        self.assertSetEqual(set(rules[47]), set([53, 13, 61, 29]))
-
-        self.assertListEqual(page_ordering[0], [75, 47, 61, 53, 29])
-        self.assertListEqual(page_ordering[-1], [97, 13, 75, 29, 47])
-        self.assertEqual(len(page_ordering), 6)
+        (puzzle_map, origin, dim)  = input_data
+        self.assertTupleEqual(origin,(6,4))
+        self.assertTupleEqual(dim,(10,10))
 
     # @unittest.skip("Skip when testing read_input_data")
     def test_perform_task(self):
@@ -144,7 +134,7 @@ class TestTask(unittest.TestCase):
         """
         input_data = read_input_data("test_input_1.txt")
         task = perform_task(input_data)
-        self.assertEqual(task, 123)
+        self.assertEqual(task, 6)
 
 
 if __name__ == "__main__":
