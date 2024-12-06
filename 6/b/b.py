@@ -95,6 +95,8 @@ def perform_task(input_data: input_data_type):
             loc = origin
             direction = UP
             puzzle_map_copy = puzzle_map.copy()
+            if puzzle_map_copy[(row,col)] != EMPTY:
+                continue
             puzzle_map_copy[(row,col)] = OBSTRUCTION
             visited_positions = set()
             visited_positions.add((loc,direction))
@@ -109,6 +111,10 @@ def perform_task(input_data: input_data_type):
                     break
                 else:
                     visited_positions.add((loc , direction))
+            progress = int((row*num_cols+col+1)/(num_rows*num_cols)*80)
+            progress_bar = "#"*progress+"-"*(80-progress)
+            print(f"\r[{progress_bar}]",end="")
+    print()
     return task
 
 
