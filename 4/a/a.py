@@ -28,8 +28,8 @@ def read_input_data(fname: str) -> input_data_type:
 
 
 def get_square_edges_diagonals_2(
-    origin: origin_type, input_data_array: np.ndarray
-) -> Tuple[np.ndarray]:
+    origin: origin_type 
+) -> Tuple[Tuple[Tuple[int,int]]]:
     """
     Assume origin=(a,b) is the top-left corner of the square.
     ---> +x
@@ -38,12 +38,12 @@ def get_square_edges_diagonals_2(
     """
     (a, b) = origin
     width = len("XMAS")
-    top = input_data_array[a, b : b + width]
-    bot = input_data_array[a + width - 1, b : b + width]
-    left = input_data_array[a : a + width, b]
-    right = input_data_array[a : a + width, b + width - 1]
-    d1 = input_data_array.diagonal()
-    d2 = np.flipud(input_data_array).diagonal()
+    top = ((a, y) for y in range(b+width))
+    bot = ((a + width - 1, y) for y in range(b+width))
+    left = ((x, b) for x in range(a+width))
+    right = ((x, b + width -1) for x in range(a+width))
+    d1 = ((x,y) for x,y in zip(range(a+width), range(b+width)))
+    d2 = ((x,y) for x,y in zip(range(a+width), range(b+width-1,b-1,-1)))
     return (top, bot, left, right, d1, d2)
 
 
@@ -87,6 +87,7 @@ def perform_task(input_data: input_data_type):
         xmas_square=xmas_square
     )
     (num_row, num_col) = input_data_array.shape
+    edges_diagonal_indices = set()
     for x in range(num_col - len(XMAS)):
         for y in range(num_row - len(XMAS)):
             xmas_square = get_xmas_square(
@@ -95,9 +96,14 @@ def perform_task(input_data: input_data_type):
             (top, bot, left, right, d1, d2) = get_square_edges_diagonals(
                 xmas_square=xmas_square
             )
-            for edge_or_diag in (top, bot, left, right, d1, d2):
+            (top_ind, bot_ind, left_ind, right_ind, d1_ind, d2_ind) = get_square_edges_diagonals_2(
+                origin=(x,y)
+            )
+            for (edge_or_diag,ind) in zip((top, bot, left, right, d1, d2),(top_ind, bot_ind, left_ind, right_ind, d1_ind, d2_ind)) :
                 if "".join(top) in [XMAS, XMAS[::-1]]:
-                    task += 1
+                    # breakpoint()
+                    edges_diagonal_indices.add(ind)
+    task = len(edges_diagonal_indices)
     return task
 
 
